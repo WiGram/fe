@@ -1,25 +1,47 @@
-t <- 100
-n <- 10000
+library(stats4)       # base package; use for mle()
+library(ggplot2)      # Graphing package (sweet)
+dev.off()             # delete plots
+rm(list = ls())       # delete variables
+cat("\014")           # clear console
+options(scipen = 999) # disable scientific notation
 
-alpha_0 <- 0.2
+# ===== Simulation settings ===== #
+T_ <- 100   #time periods
+n  <- 10000   # simulations
 
-set.seed(14)
+# True alpha-value 
+alpha_0 <- 0.3
 
-sigma2 <- matrix(0, t, n)
-x      <- matrix(0, t, n)
+# Fix random numbers
+# set.seed(12345)
+
+# Initialisation
+sigma2 <- matrix(0, n, T_)
+x      <- matrix(0, n, T_)
 stat   <- rep(0, n)
 
-z <- rnorm(n = n * t, 0, 1)
-z <- matrix(z, t, n)
+# Random number generation
+z <- rnorm(n = n * T_, 0, 1)
+z <- matrix(z, n, T_)
 
-for (i in 2:t){
-  sigma2[t] <- 1 + alpha_0 * x[t-1]
-  x[t]      <- sqrt{sigma2[t]z[t]}
+for (t in 2:T_){
+  sigma2[, t] <- 1 + alpha_0 * x[, t-1] ** 2
+  x[, t]      <- sqrt(sigma2[, t]) * z[, t]
 }
 
-y <- x ** 2 - rep(1, t)
-x <- lag(x ** 2, 1)
+Y <- x ** 2 - 1          #sig2 = 1 + alpha_0 * x^2 + e
+X <- x[, -T_] ** 2
+X <- cbind(rep(0, n), X)
 
-alpha_OLS <- sum(y * x) / sum(x*x)
+alpha_OLS <- rowSums(Y * X) / rowSums(X * X)
 
-stat <- sqrt(t) * (alpha_OLS - alpha_0)
+stat <- sqrt(T_) * (alpha_OLS - alpha_0)
+
+ggplot(NULL) +
+  geom_histogram(aes(x = stat, y = ..density..), 
+                 col = 'black', fill = 'white', bins = 50)
+
+ggplot(NULL, aes(sample = stat)) +
+  stat_qq() +
+  stat_qq_line(aes(col = 'red'), show.legend = F) +
+  ggtitle("Normal Q-Q Plot")
