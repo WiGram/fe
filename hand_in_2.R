@@ -128,7 +128,8 @@ ggplot(NULL, aes(x = z)) +
         legend.title = element_blank())
 
 ggplot(NULL) +
-  geom_line(aes(x = 1:length(z), y = z))
+  geom_line(aes(x = 1:length(z), y = z)) + 
+  labs(x = 'time', y = 'Residual value')
 
 # ============================================= #
 # ===== Exercise 4 ============================ #
