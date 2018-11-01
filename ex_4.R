@@ -49,12 +49,14 @@ for (a in alpha_0){
   ggplot(NULL) +
     geom_histogram(aes(x = stat[i, ], y = ..density..), 
                    col = 'black', fill = 'white', bins = 50) +
+    labs(x = '') +
     ggtitle(title1)
   ggsave(file1)
   
   ggplot(NULL, aes(sample = stat[i, ])) +
     stat_qq() +
     stat_qq_line(aes(col = 'red'), show.legend = F) +
+    labs(x = '') +
     ggtitle(title2)
   ggsave(file2)
 }
