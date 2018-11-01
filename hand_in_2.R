@@ -23,7 +23,7 @@ ret <- as.numeric(spy$`log-ret_x100`[-1]) #rm NA and turn numeric
 # ======= Likelihood function ======= #
 # =================================== #
 
-gjr_arch <- function(theta, y){
+gjr_lik <- function(theta, y){
   omega <- abs(theta[1])
   kappa <- abs(theta[2])
   gamma <- abs(theta[3])
@@ -38,8 +38,10 @@ gjr_arch <- function(theta, y){
   z <- y / sqrt(s2)
   
   lik <- -0.5 * (log(s2) + z ** 2)
-  
-  - sum(lik)
+}
+
+gjr_arch <- function(theta, y){
+  - sum(gjr_lik(theta, y))
 }
 
 a_arch <- function(theta, y){
@@ -74,9 +76,9 @@ theta <- c(0.88, 0.05, 0.16)
 # fit <- optim(theta, a_arch, y = ret, hessian = TRUE)
 # fit$par
 fit <- optim(theta, gjr_arch, y = ret, hessian = T)
-j <- numDeriv::jacobian(gjr_arch, x = fit$par, y = ret)
+j <- numDeriv::jacobian(gjr_lik, x = fit$par, y = ret)
 s <- t(j) %*% j
-h <- numDeriv::hessian(gjr_arch, x = fit$par, y = ret)
+h <- fit$hessian
 i <- solve(h)
 se <- sqrt(diag(i))
 robust_se <- sqrt(diag(i %*% s %*% i))
