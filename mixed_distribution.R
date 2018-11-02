@@ -91,4 +91,6 @@ s <- sqrt(exp(log_s))
 return <- s * z
 
 plotting(x, s, return, c1, c2, x_lab, y_lab)
-plot(log(s), type = 'l')
+ggplot(NULL) + 
+  geom_line(aes(x = x, y = log(s))) + 
+  labs(x = x_lab, y = y_lab)
